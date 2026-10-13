@@ -18,7 +18,7 @@ public class AlunoController {
     @Autowired
     private AlunoRepository alunoRepository;
 
-    // POST - Criar aluno (Status 201 Created)
+    // POST - Cadastrar aluno (201 Created)
     @PostMapping
     public ResponseEntity<AlunoResponse> create(@RequestBody AlunoRequest request) {
         Aluno aluno = new Aluno();
@@ -38,7 +38,7 @@ public class AlunoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // GET por ID - Com tratamento explícito de Optional com if/else (Sem lambda)
+    // GET - Buscar por ID (200 OK ou 404 Not Found com Optional explícito)
     @GetMapping("/{id}")
     public ResponseEntity<AlunoResponse> getById(@PathVariable Long id) {
         Optional<Aluno> optionalAluno = alunoRepository.findById(id);
@@ -57,34 +57,28 @@ public class AlunoController {
         }
     }
 
-    // PUT - Atualizar aluno (Status 204 No Content)
+    // PUT - Atualizar aluno (204 No Content) utilizando findById().orElseThrow()
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody AlunoRequest request) {
-        Optional<Aluno> optionalAluno = alunoRepository.findById(id);
+        Aluno aluno = alunoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado com o ID: " + id));
 
-        if (optionalAluno.isPresent()) {
-            Aluno aluno = optionalAluno.get();
-            aluno.setNome(request.getNome());
-            aluno.setEmail(request.getEmail());
-            aluno.setCurso(request.getCurso());
+        aluno.setNome(request.getNome());
+        aluno.setEmail(request.getEmail());
+        aluno.setCurso(request.getCurso());
 
-            alunoRepository.save(aluno);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        alunoRepository.save(aluno);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    // DELETE - Remover aluno (Status 204 No Content)
+    // DELETE - Remover aluno (204 No Content) utilizando existsById no if sem lambda
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        Optional<Aluno> optionalAluno = alunoRepository.findById(id);
-
-        if (optionalAluno.isPresent()) {
-            alunoRepository.delete(optionalAluno.get());
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } else {
+        if (!alunoRepository.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+
+        alunoRepository.deleteById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

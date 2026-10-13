@@ -1,7 +1,15 @@
 package org.example.sistema_aluno.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "alunos")
 public class Aluno {
@@ -13,15 +21,4 @@ public class Aluno {
     private String nome;
     private String email;
     private String curso;
-
-    public Aluno() {}
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getCurso() { return curso; }
-    public void setCurso(String curso) { this.curso = curso; }
 }
